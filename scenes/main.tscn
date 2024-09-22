@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://cdmb44opjm2wa"]
+[gd_scene load_steps=3 format=3 uid="uid://cdmb44opjm2wa"]
 
 [ext_resource type="Script" path="res://scenes/Main.cs" id="1_74tar"]
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bwacg"]
+size = Vector2(64, 64)
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_74tar")
+
+[node name="Cursor" type="Sprite2D" parent="."]
+texture = SubResource("PlaceholderTexture2D_bwacg")
+centered = false
