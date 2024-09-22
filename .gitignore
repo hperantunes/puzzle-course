@@ -1,6 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 
+# VS
+.vs
+
 # .net
 bin/
 obj/
