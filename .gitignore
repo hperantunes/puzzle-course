@@ -1,8 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 
-# VS
+# IDE
 .vs
+.vscode
 
 # .net
 bin/
