@@ -4,6 +4,7 @@
 # IDE
 .vs
 .vscode
+Properties
 
 # .net
 bin/
