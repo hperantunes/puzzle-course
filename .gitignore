@@ -4,8 +4,11 @@
 # IDE
 .vs
 .vscode
-Properties
+Properties/
 
 # .net
 bin/
 obj/
+
+# Project-specific
+vendor/
