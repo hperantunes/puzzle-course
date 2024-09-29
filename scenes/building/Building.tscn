@@ -6,6 +6,7 @@
 [node name="Building" type="Node2D"]
 
 [node name="BuildingComponent" parent="." instance=ExtResource("1_6l1tb")]
+BuildableRadius = 3
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_fxu2o")
