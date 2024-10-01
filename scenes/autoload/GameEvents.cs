@@ -5,10 +5,10 @@ namespace Game.Autoload;
 
 public partial class GameEvents : Node
 {
-	public static GameEvents Instance { get; private set; }
+    public static GameEvents Instance { get; private set; }
 
     [Signal]
-	public delegate void BuildingPlacedEventHandler(BuildingComponent buildingComponent);
+    public delegate void BuildingPlacedEventHandler(BuildingComponent buildingComponent);
 
     public override void _Notification(int what)
     {

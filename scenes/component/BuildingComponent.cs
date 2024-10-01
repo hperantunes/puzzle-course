@@ -1,21 +1,21 @@
-using Game.Autoload;
+﻿using Game.Autoload;
 using Godot;
 
 namespace Game.Component;
 
 public partial class BuildingComponent : Node2D
 {
-	[Export]
-	public int BuildableRadius { get; private set; }
+    [Export]
+    public int BuildableRadius { get; private set; }
 
     public override void _Ready()
-	{
-		AddToGroup(nameof(BuildingComponent));
-		Callable.From(() => GameEvents.EmitBuildingPlaced(this)).CallDeferred();
-	}
+    {
+        AddToGroup(nameof(BuildingComponent));
+        Callable.From(() => GameEvents.EmitBuildingPlaced(this)).CallDeferred();
+    }
 
-	public Vector2I GetGridCellPosition()
-	{
+    public Vector2I GetGridCellPosition()
+    {
         var gridPosition = GlobalPosition / 64;
         gridPosition = gridPosition.Floor();
         return new Vector2I((int)gridPosition.X, (int)gridPosition.Y);
