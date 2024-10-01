@@ -33,6 +33,21 @@ public partial class Main : Node
         placeVillageButton.Pressed += OnPlaceVillageButtonPressed;
     }
 
+    public override void _Process(double delta)
+    {
+        var gridPosition = gridManager.GetMouseGridCellPosition();
+        cursor.GlobalPosition = gridPosition * 64;
+        if (toPlaceBuildingResource != null
+            && cursor.Visible
+            && (!hoveredGridCell.HasValue || hoveredGridCell.Value != gridPosition))
+        {
+            hoveredGridCell = gridPosition;
+            gridManager.ClearHighlightedTiles();
+            gridManager.HighlightExpandedBuildableTiles(hoveredGridCell.Value, toPlaceBuildingResource.BuildableRadius);
+            gridManager.HighlightResourceTiles(hoveredGridCell.Value, toPlaceBuildingResource.ResourceRadius);
+        }
+    }
+
     public override void _UnhandledInput(InputEvent @event)
     {
         if (hoveredGridCell.HasValue
@@ -41,19 +56,6 @@ public partial class Main : Node
         {
             PlaceBuildingAtHoveredCellPosition();
             cursor.Visible = false;
-        }
-    }
-
-    public override void _Process(double delta)
-    {
-        var gridPosition = gridManager.GetMouseGridCellPosition();
-        cursor.GlobalPosition = gridPosition * 64;
-        if (toPlaceBuildingResource != null 
-            && cursor.Visible 
-            && (!hoveredGridCell.HasValue || hoveredGridCell.Value != gridPosition))
-        {
-            hoveredGridCell = gridPosition;
-            gridManager.HighlightExpandedBuildableTiles(hoveredGridCell.Value, toPlaceBuildingResource.BuildableRadius);
         }
     }
 
