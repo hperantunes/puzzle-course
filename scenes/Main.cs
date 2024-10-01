@@ -1,4 +1,4 @@
-using Game.Manager;
+﻿using Game.Manager;
 using Godot;
 
 namespace Game;
