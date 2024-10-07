@@ -1,4 +1,5 @@
-﻿using Game.Resources.Building;
+﻿using Game.Building;
+using Game.Resources.Building;
 using Game.UI;
 using Godot;
 
@@ -17,7 +18,7 @@ public partial class BuildingManager : Node
 
     private BuildingResource toPlaceBuildingResource;
     private Vector2I? hoveredGridCell;
-    private Node2D buildingGhost;
+    private BuildingGhost buildingGhost;
 
     private int currentResourceCount;
     private int startingResourceCount = 4;
@@ -44,9 +45,7 @@ public partial class BuildingManager : Node
             && (!hoveredGridCell.HasValue || hoveredGridCell.Value != gridPosition))
         {
             hoveredGridCell = gridPosition;
-            gridManager.ClearHighlightedTiles();
-            gridManager.HighlightExpandedBuildableTiles(hoveredGridCell.Value, toPlaceBuildingResource.BuildableRadius);
-            gridManager.HighlightResourceTiles(hoveredGridCell.Value, toPlaceBuildingResource.ResourceRadius);
+            UpdateGridDisplay();
         }
     }
 
@@ -55,10 +54,30 @@ public partial class BuildingManager : Node
         if (hoveredGridCell.HasValue
             && toPlaceBuildingResource != null
             && @event.IsActionPressed("left_click")
-            && gridManager.IsTilePositionBuildable(hoveredGridCell.Value)
-            && availableResourceCount >= toPlaceBuildingResource.ResourceCost)
+            && IsBuildingPlaceableAtTile(hoveredGridCell.Value))
         {
             PlaceBuildingAtHoveredCellPosition();
+        }
+    }
+
+    private void UpdateGridDisplay()
+    {
+        if (hoveredGridCell == null)
+        {
+            return;
+        }
+
+        gridManager.ClearHighlightedTiles();
+        gridManager.HighlightBuildableTiles();
+        if (IsBuildingPlaceableAtTile(hoveredGridCell.Value))
+        {
+            gridManager.HighlightExpandedBuildableTiles(hoveredGridCell.Value, toPlaceBuildingResource.BuildableRadius);
+            gridManager.HighlightResourceTiles(hoveredGridCell.Value, toPlaceBuildingResource.ResourceRadius);
+            buildingGhost.SetValid();
+        }
+        else
+        {
+            buildingGhost.SetInvalid();
         }
     }
 
@@ -82,6 +101,12 @@ public partial class BuildingManager : Node
         buildingGhost = null;
     }
 
+    private bool IsBuildingPlaceableAtTile(Vector2I tilePosition)
+    {
+        return gridManager.IsTilePositionBuildable(tilePosition)
+            && availableResourceCount >= toPlaceBuildingResource.ResourceCost;
+    }
+
     private void OnResourceTilesUpdated(int resourceCount)
     {
         currentResourceCount = resourceCount;
@@ -94,14 +119,14 @@ public partial class BuildingManager : Node
             buildingGhost.QueueFree();
         }
 
-        buildingGhost = buildingGhostScene.Instantiate<Node2D>();
+        buildingGhost = buildingGhostScene.Instantiate<BuildingGhost>();
         ySortRoot.AddChild(buildingGhost);
 
         var buildingSprite = buildingResource.SpriteScene.Instantiate<Sprite2D>();
         buildingGhost.AddChild(buildingSprite);
 
         toPlaceBuildingResource = buildingResource;
-        gridManager.HighlightBuildableTiles();
+        UpdateGridDisplay();
     }
 }
 
