@@ -8,6 +8,7 @@ namespace Game.Manager;
 public partial class BuildingManager : Node
 {
     private readonly StringName ActionLeftClick = "left_click";
+    private readonly StringName ActionRightClick = "right_click";
     private readonly StringName ActionCancel = "cancel";
 
     [Export]
@@ -19,8 +20,16 @@ public partial class BuildingManager : Node
     [Export]
     private PackedScene buildingGhostScene;
 
+    private enum State
+    {
+        Normal,
+        PlacingBuilding
+    }
+
+    private State currentState;
+
     private BuildingResource toPlaceBuildingResource;
-    private Vector2I? hoveredGridCell;
+    private Vector2I hoveredGridCell;
     private BuildingGhost buildingGhost;
 
     private int currentResourceCount;
@@ -37,49 +46,58 @@ public partial class BuildingManager : Node
 
     public override void _Process(double delta)
     {
-        if (!IsInstanceValid(buildingGhost))
-        {
-            return;
-        }
-
         var gridPosition = gridManager.GetMouseGridCellPosition();
-        buildingGhost.GlobalPosition = gridPosition * 64;
-        if (toPlaceBuildingResource != null
-            && (!hoveredGridCell.HasValue || hoveredGridCell.Value != gridPosition))
+        if (hoveredGridCell != gridPosition)
         {
             hoveredGridCell = gridPosition;
-            UpdateGridDisplay();
+            UpdateHoveredGridCell();
+        }
+
+        switch (currentState)
+        {
+            case State.Normal:
+                break;
+            case State.PlacingBuilding:
+                buildingGhost.GlobalPosition = gridPosition * 64;
+                break;
         }
     }
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (@event.IsActionPressed(ActionCancel))
+        switch (currentState)
         {
-            ClearBuildingGhost();
-        }
-        else if (@event.IsActionPressed(ActionLeftClick)
-            && hoveredGridCell.HasValue
-            && toPlaceBuildingResource != null
-            && IsBuildingPlaceableAtTile(hoveredGridCell.Value))
-        {
-            PlaceBuildingAtHoveredCellPosition();
+            case State.Normal:
+                if (@event.IsActionPressed(ActionRightClick))
+                {
+                    DestroyBuildingAtHoveredCellPosition();
+                }
+                break;
+            case State.PlacingBuilding:
+                if (@event.IsActionPressed(ActionCancel))
+                {
+                    ChangeState(State.Normal);
+                }
+                else if (@event.IsActionPressed(ActionLeftClick)
+                    && toPlaceBuildingResource != null
+                    && IsBuildingPlaceableAtTile(hoveredGridCell))
+                {
+                    PlaceBuildingAtHoveredCellPosition();
+                }
+                break;
+            default:
+                break;
         }
     }
 
     private void UpdateGridDisplay()
     {
-        if (hoveredGridCell == null)
-        {
-            return;
-        }
-
         gridManager.ClearHighlightedTiles();
         gridManager.HighlightBuildableTiles();
-        if (IsBuildingPlaceableAtTile(hoveredGridCell.Value))
+        if (IsBuildingPlaceableAtTile(hoveredGridCell))
         {
-            gridManager.HighlightExpandedBuildableTiles(hoveredGridCell.Value, toPlaceBuildingResource.BuildableRadius);
-            gridManager.HighlightResourceTiles(hoveredGridCell.Value, toPlaceBuildingResource.ResourceRadius);
+            gridManager.HighlightExpandedBuildableTiles(hoveredGridCell, toPlaceBuildingResource.BuildableRadius);
+            gridManager.HighlightResourceTiles(hoveredGridCell, toPlaceBuildingResource.ResourceRadius);
             buildingGhost.SetValid();
         }
         else
@@ -90,24 +108,23 @@ public partial class BuildingManager : Node
 
     private void PlaceBuildingAtHoveredCellPosition()
     {
-        if (!hoveredGridCell.HasValue)
-        {
-            return;
-        }
-
         var building = toPlaceBuildingResource.BuildingScene.Instantiate<Node2D>();
         ySortRoot.AddChild(building);
 
-        building.GlobalPosition = hoveredGridCell.Value * 64;
+        building.GlobalPosition = hoveredGridCell * 64;
 
         currentlyUsedResourceCount += toPlaceBuildingResource.ResourceCost;
 
-        ClearBuildingGhost();
+        ChangeState(State.Normal);
+    }
+
+    private void DestroyBuildingAtHoveredCellPosition()
+    {
+
     }
 
     private void ClearBuildingGhost()
     {
-        hoveredGridCell = null;
         gridManager.ClearHighlightedTiles();
 
         if (IsInstanceValid(buildingGhost))
@@ -123,6 +140,43 @@ public partial class BuildingManager : Node
             && availableResourceCount >= toPlaceBuildingResource.ResourceCost;
     }
 
+    private void UpdateHoveredGridCell()
+    {
+        switch (currentState)
+        {
+            case State.Normal:
+                break;
+            case State.PlacingBuilding:
+                UpdateGridDisplay();
+                break;
+        }
+    }
+
+    private void ChangeState(State toState)
+    {
+        switch (currentState)
+        {
+            case State.Normal:
+                break;
+            case State.PlacingBuilding:
+                ClearBuildingGhost();
+                toPlaceBuildingResource = null;
+                break;
+        }
+
+        currentState = toState;
+
+        switch (currentState)
+        {
+            case State.Normal:
+                break;
+            case State.PlacingBuilding:
+                buildingGhost = buildingGhostScene.Instantiate<BuildingGhost>();
+                ySortRoot.AddChild(buildingGhost);
+                break;
+        }
+    }
+
     private void OnResourceTilesUpdated(int resourceCount)
     {
         currentResourceCount = resourceCount;
@@ -130,13 +184,7 @@ public partial class BuildingManager : Node
 
     private void OnBuildingResourceSelected(BuildingResource buildingResource)
     {
-        if (IsInstanceValid(buildingGhost))
-        {
-            buildingGhost.QueueFree();
-        }
-
-        buildingGhost = buildingGhostScene.Instantiate<BuildingGhost>();
-        ySortRoot.AddChild(buildingGhost);
+        ChangeState(State.PlacingBuilding);
 
         var buildingSprite = buildingResource.SpriteScene.Instantiate<Sprite2D>();
         buildingGhost.AddChild(buildingSprite);
@@ -145,4 +193,3 @@ public partial class BuildingManager : Node
         UpdateGridDisplay();
     }
 }
-
