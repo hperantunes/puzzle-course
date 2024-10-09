@@ -1,9 +1,9 @@
 ﻿using Game.Manager;
 using Godot;
 
-namespace Game;
+namespace Game.Level;
 
-public partial class Main : Node
+public partial class BaseLevel : Node
 {
     private GridManager gridManager;
     private GoldMine goldMine;
