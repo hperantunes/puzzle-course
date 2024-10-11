@@ -9,8 +9,9 @@ namespace Game.Manager;
 
 public partial class GridManager : Node
 {
-    private const string IsBuildable = "is_buildable";
-    private const string IsWood = "is_wood";
+    private const string isBuildable = "is_buildable";
+    private const string isWood = "is_wood";
+    private const string isIgnored = "is_ignored";
 
     [Signal]
     public delegate void ResourceTilesUpdatedEventHandler(int collectedTiles);
@@ -41,7 +42,7 @@ public partial class GridManager : Node
         foreach (var layer in allTileMapLayers)
         {
             var customData = layer.GetCellTileData(tilePosition);
-            if (customData == null)
+            if (customData == null || (bool)customData.GetCustomData(isIgnored))
             {
                 continue;
             }
@@ -188,12 +189,12 @@ public partial class GridManager : Node
 
     private List<Vector2I> GetValidTilesInRadius(Vector2I rootCell, int radius)
     {
-        return GetTilesInRadius(rootCell, radius, (tilePosition) => TileHasCustomData(tilePosition, IsBuildable));
+        return GetTilesInRadius(rootCell, radius, (tilePosition) => TileHasCustomData(tilePosition, isBuildable));
     }
 
     private List<Vector2I> GetResourceTilesInRadius(Vector2I rootCell, int radius)
     {
-        return GetTilesInRadius(rootCell, radius, (tilePosition) => TileHasCustomData(tilePosition, IsWood));
+        return GetTilesInRadius(rootCell, radius, (tilePosition) => TileHasCustomData(tilePosition, isWood));
     }
 
     private void OnBuildingPlaced(BuildingComponent buildingComponent)
