@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dn8jiqehtafi1" path="res://assets/buildings/tower_blue.png" id="1_hp0wj"]
 
 [node name="TowerSprite2D" type="Sprite2D"]
-position = Vector2(32, 32)
+position = Vector2(64, 96)
 texture = ExtResource("1_hp0wj")
 centered = false
-offset = Vector2(-64, -204)
+offset = Vector2(-64, -236)
