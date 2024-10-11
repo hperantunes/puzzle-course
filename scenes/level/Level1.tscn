@@ -42,7 +42,7 @@ tile_map_data = PackedByteArray("AAAJAAYAAQAAAAAAAAAIAAcAAQAAAAAAAAAHAAYAAQAAAAA
 tile_set = ExtResource("2_4qtco")
 
 [node name="Base" parent="YSortRoot" index="1"]
-position = Vector2(192, 512)
+position = Vector2(0, 512)
 
 [node name="GoldMine" parent="YSortRoot" index="2"]
 position = Vector2(832, 384)
