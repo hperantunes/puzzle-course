@@ -60,15 +60,7 @@ public partial class GridManager : Node
 
     public bool IsTileAreaBuildable(Rect2I tileArea)
     {
-        var tiles = new List<Vector2I>();
-        for (var x = tileArea.Position.X; x < tileArea.End.X; x++)
-        {
-            for (var y = tileArea.Position.Y; y < tileArea.End.Y; y++)
-            {
-                tiles.Add(new Vector2I(x, y));
-            }
-        }
-
+        var tiles = tileArea.ToTiles();
         if (tiles.Count == 0)
         {
             return false;
@@ -247,7 +239,7 @@ public partial class GridManager : Node
 
     private List<Vector2I> GetValidTilesInRadius(Rect2I tileArea, int radius)
     {
-        
+
         return GetTilesInRadius(tileArea, radius, (tilePosition) =>
         {
             (_, bool matchesCustomData) = GetTileCustomData(tilePosition, isBuildable);
@@ -257,7 +249,7 @@ public partial class GridManager : Node
 
     private List<Vector2I> GetResourceTilesInRadius(Rect2I tileArea, int radius)
     {
-        return GetTilesInRadius(tileArea, radius, (tilePosition) => 
+        return GetTilesInRadius(tileArea, radius, (tilePosition) =>
         {
             (_, bool matchesCustomData) = GetTileCustomData(tilePosition, isWood);
             return matchesCustomData;
