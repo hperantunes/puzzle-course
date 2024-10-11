@@ -14,6 +14,8 @@ public partial class BuildingManager : Node
     private readonly StringName ActionCancel = "cancel";
 
     [Export]
+    private int startingResourceCount = 4;
+    [Export]
     private GridManager gridManager;
     [Export]
     private GameUI gameUI;
@@ -35,7 +37,6 @@ public partial class BuildingManager : Node
     private BuildingGhost buildingGhost;
 
     private int currentResourceCount;
-    private int startingResourceCount = 4;
     private int currentlyUsedResourceCount;
 
     private int availableResourceCount => startingResourceCount + currentResourceCount - currentlyUsedResourceCount;

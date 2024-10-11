@@ -27,4 +27,9 @@ public partial class GameCamera : Camera2D
         LimitTop = boundingRect.Position.Y * tileSize;
         LimitBottom = boundingRect.End.Y * tileSize;
     }
+
+    public void CenterOnPosition(Vector2 position)
+    {
+        GlobalPosition = position;
+    }
 }
