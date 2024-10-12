@@ -10,5 +10,5 @@ IsDeletable = false
 Dimensions = Vector2i(5, 2)
 ResourceCost = 0
 BuildableRadius = 3
-ResourceRadius = 0
+ResourceRadius = 6
 BuildingScene = ExtResource("1_adha2")

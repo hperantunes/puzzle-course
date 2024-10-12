@@ -17,4 +17,9 @@ public static class Rect2IExtensions
         }
         return tiles;
     }
+
+    public static Rect2 ToRect2F(this Rect2I rect)
+    {
+        return new Rect2(rect.Position, rect.Size);
+    }
 }
