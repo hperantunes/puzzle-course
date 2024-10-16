@@ -13,6 +13,9 @@ public partial class BuildingManager : Node
     private readonly StringName ActionRightClick = "right_click";
     private readonly StringName ActionCancel = "cancel";
 
+    [Signal]
+    public delegate void AvailableResourceCountChangedEventHandler(int availableResourceCount);
+
     [Export]
     private int startingResourceCount = 4;
     [Export]
@@ -39,12 +42,14 @@ public partial class BuildingManager : Node
     private int currentResourceCount;
     private int currentlyUsedResourceCount;
 
-    private int availableResourceCount => startingResourceCount + currentResourceCount - currentlyUsedResourceCount;
+    private int AvailableResourceCount => startingResourceCount + currentResourceCount - currentlyUsedResourceCount;
 
     public override void _Ready()
     {
         gridManager.ResourceTilesUpdated += OnResourceTilesUpdated;
         gameUI.BuildingResourceSelected += OnBuildingResourceSelected;
+
+        Callable.From(() => EmitSignal(SignalName.AvailableResourceCountChanged, AvailableResourceCount)).CallDeferred();
     }
 
     public override void _Process(double delta)
@@ -120,6 +125,7 @@ public partial class BuildingManager : Node
         currentlyUsedResourceCount += toPlaceBuildingResource.ResourceCost;
 
         ChangeState(State.Normal);
+        EmitSignal(SignalName.AvailableResourceCountChanged, AvailableResourceCount);
     }
 
     private void DestroyBuildingAtHoveredCellPosition()
@@ -141,6 +147,7 @@ public partial class BuildingManager : Node
 
         currentlyUsedResourceCount -= buildingComponent.BuildingResource.ResourceCost;
         buildingComponent.Destroy();
+        EmitSignal(SignalName.AvailableResourceCountChanged, AvailableResourceCount);
     }
 
     private void ClearBuildingGhost()
@@ -157,7 +164,7 @@ public partial class BuildingManager : Node
     private bool IsBuildingPlaceableAtArea(Rect2I tileArea)
     {
         var allBuildableTiles = gridManager.IsTileAreaBuildable(tileArea);
-        return allBuildableTiles && availableResourceCount >= toPlaceBuildingResource.ResourceCost;
+        return allBuildableTiles && AvailableResourceCount >= toPlaceBuildingResource.ResourceCost;
     }
 
     private void UpdateHoveredGridArea()
@@ -200,6 +207,7 @@ public partial class BuildingManager : Node
     private void OnResourceTilesUpdated(int resourceCount)
     {
         currentResourceCount = resourceCount;
+        EmitSignal(SignalName.AvailableResourceCountChanged, AvailableResourceCount);
     }
 
     private void OnBuildingResourceSelected(BuildingResource buildingResource)

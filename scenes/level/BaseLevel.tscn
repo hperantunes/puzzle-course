@@ -24,7 +24,8 @@ buildingGhostScene = ExtResource("8_ia1i5")
 highlightTileMapLayer = NodePath("../HighlightTileMapLayer")
 baseTerrainTileMapLayer = NodePath("../YSortRoot/BaseTerrainTileMapLayer")
 
-[node name="GameUI" parent="." instance=ExtResource("6_x7qaa")]
+[node name="GameUI" parent="." node_paths=PackedStringArray("buildingManager") instance=ExtResource("6_x7qaa")]
+buildingManager = NodePath("../BuildingManager")
 
 [node name="GameCamera" parent="." instance=ExtResource("5_hye7a")]
 
