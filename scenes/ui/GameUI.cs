@@ -28,6 +28,11 @@ public partial class GameUI : CanvasLayer
         buildingManager.AvailableResourceCountChanged += OnAvailableResourceCountChanged;
     }
 
+    public void HideUI()
+    {
+        Visible = false;
+    }
+
     private void CreateBuildingSections()
     {
         foreach (var buildingResource in buildingResources)
